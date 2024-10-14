@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "234751558894",
+    "firebase_url": "https://fir-tutorial-35d29-default-rtdb.firebaseio.com",
     "project_id": "fir-tutorial-35d29",
     "storage_bucket": "fir-tutorial-35d29.appspot.com"
   },
@@ -12,7 +13,28 @@
           "package_name": "com.example.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "234751558894-1ba80rlgf26tlbgtf87t912j6gdd6l7j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.app",
+            "certificate_hash": "51a58e8b600d85e50502cab09f3039d5d986596b"
+          }
+        },
+        {
+          "client_id": "234751558894-70g641igi1h4chh7i05cvl2jkfrbiplh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.app",
+            "certificate_hash": "c804e7cf167d85f79b1e5e0cbd976bb100470df9"
+          }
+        },
+        {
+          "client_id": "234751558894-oatlmt4co99lak07jpv9gnu0qnpoi1ik.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyA7ezMyFp6lyhd2vnhZ5QXARZoCoeoJ5BU"
@@ -20,7 +42,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "234751558894-oatlmt4co99lak07jpv9gnu0qnpoi1ik.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
