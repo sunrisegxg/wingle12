@@ -1,4 +1,5 @@
 import 'package:app/components/navigationprovider.dart';
+import 'package:app/pages/detailed_page/language_page.dart';
 import 'package:app/services/auth/auth_page.dart';
 import 'package:app/services/auth/auth_service.dart';
 import 'package:app/services/chat/chat_service.dart';
@@ -184,29 +185,32 @@ class _MySettingsPageState extends State<MySettingsPage> {
               ]
             ),
           ),
-          Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.secondary,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            margin: const EdgeInsets.only(right: 25, left: 25, bottom: 20),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 23),
-            child: Row(
-              children: [
-                Container(
-                  width: 30,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.orange.shade400, // Màu nền của hình tròn
+          GestureDetector(
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => LanguagePage(),)),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondary,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.only(right: 25, left: 25, bottom: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 23),
+              child: Row(
+                children: [
+                  Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.orange.shade400, // Màu nền của hình tròn
+                    ),
+                    child: Center(
+                      child: Icon(Icons.language, size: 17, color: isDarkMode ? Colors.white : Colors.white,),
+                    ),
                   ),
-                  child: Center(
-                    child: Icon(Icons.language, size: 17, color: isDarkMode ? Colors.white : Colors.white,),
-                  ),
-                ),
-                SizedBox(width: 10,),
-                const Text("Language and region",  style: TextStyle(fontSize: 17),),
-              ],
+                  SizedBox(width: 10,),
+                  const Text("Language and region",  style: TextStyle(fontSize: 17),),
+                ],
+              ),
             ),
           ),
           Container(

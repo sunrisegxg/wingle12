@@ -441,6 +441,7 @@ class _UploadPageState extends State<UploadPage> {
     bool isDarkMode =
         Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: GestureDetector(
         onTap: () {
           setState(() {

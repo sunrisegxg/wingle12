@@ -65,6 +65,8 @@ dependencies:
   shared_preferences: ^2.2.3
   zego_uikit_prebuilt_call: ^4.9.0
   flutter_callkit_incoming_yoer: ^2.0.4+1
+  zego_uikit_signaling_plugin: ^2.8.3
+  translator: ^1.0.0
 
 dev_dependencies:
   flutter_test:

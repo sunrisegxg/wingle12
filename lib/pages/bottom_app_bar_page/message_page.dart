@@ -19,6 +19,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
+import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
 
 class ChatPageActiveProvider with ChangeNotifier {
   Map<String, bool> _userChatPageActiveMap = {};
@@ -56,6 +58,7 @@ class _MyMessagePageState extends State<MyMessagePage> {
   @override
   void initState() {
     loadData();
+
     super.initState();
   }
 
@@ -65,6 +68,17 @@ class _MyMessagePageState extends State<MyMessagePage> {
     super.dispose();
   }
 
+  // void initzego() {
+  //   ZegoUIKitPrebuiltCallInvitationService.init(
+  //     plugins: [ZegoUIKitSignalingPlugin()],
+  //     appID: 1007293522,
+  //     appSign: '20962baf250e829a7e9b17ddc9a03f4d5345db7bd344079264bb0e80a47d7d55',
+  //     // callID: widget.callid,
+  //     userID: ,
+  //     userName: "User : ${widget.userid}",
+  //     config: 
+  //   );
+  // }
   final user = FirebaseAuth.instance.currentUser!;
   //chat & auth service
   final ChatService _chatService = ChatService();
@@ -568,4 +582,5 @@ class _MyMessagePageState extends State<MyMessagePage> {
       return Container();
     }
   }
+
 }
