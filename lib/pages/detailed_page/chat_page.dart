@@ -38,7 +38,6 @@ class _ChatPageState extends State<ChatPage> {
 
   @override void initState() {
     super.initState();
-
     // add listener to focus node
     myFocusNode.addListener(() {
       if (myFocusNode.hasFocus) {
@@ -58,6 +57,28 @@ class _ChatPageState extends State<ChatPage> {
     // WidgetsBinding.instance.addPostFrameCallback((_) => scrollDown());
   }
 
+  void sendCallInvite(bool isVideo) {
+    List<String> ids = [widget.receiverID, _authService.getCurrentUser()!.uid];
+    ids.sort();
+    String chatRoomID = ids.join('_');
+    // Tạo danh sách người dùng từ IDs
+    List<ZegoCallUser> invitees = ids.map((id) {
+      return ZegoCallUser.fromUIKit(
+        ZegoUIKitUser(
+          id: id,
+          name: "User: $id",
+        ),
+      );
+    }).toList();
+
+    // Gửi lời mời cho tất cả người dùng trong danh sách
+    ZegoUIKitPrebuiltCallInvitationService().send(
+      invitees: invitees,
+      callID: chatRoomID,
+      isVideoCall: isVideo,
+      resourceID: "zegouikit_call",
+    );
+  }
   // scroll controller
   final ScrollController _scrollController = ScrollController();
   void scrollDown() {
@@ -151,35 +172,7 @@ class _ChatPageState extends State<ChatPage> {
             ),
             child: InkWell(
               onTap: () {
-                // List<String> ids = [widget.receiverID, senderID];
-                // ids.sort();
-                // String chatRoomID = ids.join('_');
-                // ZegoUIKitPrebuiltCallInvitationService().init(
-                //   appID: 1007293522,
-                //   appSign: '20962baf250e829a7e9b17ddc9a03f4d5345db7bd344079264bb0e80a47d7d55',
-                //   // callID: widget.callid,
-                //   userID: senderID,
-                //   userName: "User : $senderID",
-                //   plugins: [ZegoUIKitSignalingPlugin()],
-                //   // config: ZegoCallInvitationConfig(
-                //   //   permissions: [
-                //   //     ZegoCallInvitationPermission.microphone,
-                //   //     ZegoCallInvitationPermission.camera,
-                //   //   ]),
-                //   // requireConfig: (ZegoCallInvitationData data) {
-                //   //   String callID = chatRoomID;
-                //   //   if (data.) {
-                //   //     return ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall()
-                //   //       ..turnOnCameraWhenJoining = true // Bật camera khi vào cuộc gọi video
-                //   //       ..turnOnMicrophoneWhenJoining = true // Bật micro khi vào cuộc gọi
-                //   //       ..useSpeakerWhenJoining = true; // Sử dụng loa ngoài
-                //   //   } else {
-                //   //     return ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall()
-                //   //       ..turnOnMicrophoneWhenJoining = true // Bật micro khi vào cuộc gọi thoại
-                //   //       ..useSpeakerWhenJoining = false; // Tắt loa ngoài cho cuộc gọi thoại
-                //   //   }
-                //   // },
-                // );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => CallInvite(userid: widget.receiverID, isVideo: false),));
               },
               child: Center(
                 child: Icon(Icons.call_outlined, color: isDarkMode ? Colors.grey.shade500 : Colors.black,),
@@ -199,30 +192,7 @@ class _ChatPageState extends State<ChatPage> {
             ),
             child: InkWell(
               onTap: () {
-                // List<String> ids = [widget.receiverID, senderID];
-                // ids.sort();
-                // String chatRoomID = ids.join('_');
-                ZegoUIKitPrebuiltCallInvitationService().init(
-                  appID: 1007293522,
-                  appSign: '20962baf250e829a7e9b17ddc9a03f4d5345db7bd344079264bb0e80a47d7d55',
-                  // callID: widget.callid,
-                  userID: senderID,
-                  userName: "User : $senderID",
-                  plugins: [ZegoUIKitSignalingPlugin()],
-                  config: ZegoCallInvitationConfig(
-                    permissions: [
-                      ZegoCallInvitationPermission.microphone,
-                      ZegoCallInvitationPermission.camera,
-                    ]),
-                  requireConfig: (ZegoCallInvitationData data) {
-                    return ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall()
-                      ..turnOnCameraWhenJoining = true
-                      ..turnOnMicrophoneWhenJoining = true
-                      ..useSpeakerWhenJoining = false;
-                  },
-
-                );
-                Navigator.push(context, MaterialPageRoute(builder: (context) => CallInvite(userid: widget.receiverID, isVideo: true,),));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => CallInvite(userid: widget.receiverID, isVideo: true),));
               },
               child: Center(
                 child: Icon(Icons.videocam_outlined, color: isDarkMode ? Colors.grey.shade500 : Colors.black,),

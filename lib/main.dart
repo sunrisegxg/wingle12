@@ -4,9 +4,11 @@ import 'dart:io';
 import 'package:app/components/navigationprovider.dart';
 import 'package:app/components/page_common.dart';
 import 'package:app/intro/onboarding_screen.dart';
+import 'package:app/pages/bottom_app_bar_page/home_page.dart';
 import 'package:app/pages/bottom_app_bar_page/message_page.dart';
 import 'package:app/pages/detailed_page/chat_page.dart';
 import 'package:app/services/auth/auth_page.dart';
+import 'package:app/storage/dynamics_link.dart';
 import 'package:app/themes/theme_provider.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/material.dart';
@@ -14,12 +16,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
+import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
+final navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
-  // await ZIMKit().init(
-  //   appID: 1007293522,
-  //   appSign: '20962baf250e829a7e9b17ddc9a03f4d5345db7bd344079264bb0e80a47d7d55',
-  // );
   WidgetsFlutterBinding.ensureInitialized();
   Platform.isAndroid ? await Firebase.initializeApp(
     options: const FirebaseOptions(
@@ -33,32 +33,58 @@ void main() async {
   await FirebaseAppCheck.instance.activate(
     androidProvider: AndroidProvider.debug
   );
+  DynamicLinkProvider().initDynamicLink();
+  /// 1.1.2: set navigator key to ZegoUIKitPrebuiltCallInvitationService
+  ZegoUIKitPrebuiltCallInvitationService().setNavigatorKey(navigatorKey);
   final prefs = await SharedPreferences.getInstance();
   final onboarding = prefs.getBool('onboarding')??false;
+  final isLoggedIn = prefs.getBool('isLoggedIn')??false;
+  // call the useSystemCallingUI
+  ZegoUIKit().initLog().then((value) {
+    ZegoUIKitPrebuiltCallInvitationService().useSystemCallingUI(
+      [ZegoUIKitSignalingPlugin()],
+    );
+
+    runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => ThemeProvider()),
+          ChangeNotifierProvider(create: (context) => ChatPageActiveProvider()),
+          ChangeNotifierProvider(create: (context) => NavigationProvider()),
+          // Thêm các provider khác nếu cần
+        ],
+        child: MyApp(
+          onboarding: onboarding,
+          isLoggedIn: isLoggedIn,
+          navigatorKey: navigatorKey,
+        ),
+      ),
+    );
+  });
   
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => ThemeProvider()),
-        ChangeNotifierProvider(create: (context) => ChatPageActiveProvider()),
-        ChangeNotifierProvider(create: (context) => NavigationProvider()),
-        // Thêm các provider khác nếu cần
-      ],
-      child: MyApp(onboarding: onboarding),
-    ),
-  );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  final GlobalKey<NavigatorState> navigatorKey;
   final bool onboarding;
-  const MyApp({super.key, this.onboarding = false});
+  final bool isLoggedIn;
+  const MyApp({super.key, this.onboarding = false, this.isLoggedIn = false, required this.navigatorKey});
 
+  @override
+  State<MyApp> createState() => MyAppState();
+}
+
+class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: widget.navigatorKey,
       // routerConfig: router,
       debugShowCheckedModeBanner: false,
-      home: onboarding ? const AuthPage() : const OnBoardingScreen(),
+      home: (widget.onboarding) 
+        ? (widget.isLoggedIn) 
+          ? const CommonPage() : const AuthPage()
+        : const OnBoardingScreen(),
       theme: Provider.of<ThemeProvider>(context).themeData,
     );
   }

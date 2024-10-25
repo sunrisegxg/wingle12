@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:app/components/page_common.dart';
 import 'package:app/services/auth/auth_page.dart';
 import 'package:app/components/button_sign_in.dart';
@@ -10,6 +12,7 @@ import 'package:app/services/gg-fb/firebase_services.dart';
 import 'package:app/services/gg-fb/firebase_services2.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback showRegisterPage;
@@ -32,24 +35,25 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       _isLoading = true;
     });
-
-    // Chờ 5 giây trước khi chuyển trang
-
     //try log in
     try {
       if (_validateFields()) {
-      await authService.signInWithEmailAndPassword(
-        _emailController.text.trim(),
-        _passwordController.text.trim(),
-      );
-      Future.delayed(const Duration(seconds: 5), () {
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => const CommonPage(),
-        ));
-        setState(() {
-        _isLoading = false;
-      });
-      });
+        await authService.signInWithEmailAndPassword(
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
+        );
+        final pres = await SharedPreferences.getInstance();
+        pres.setBool('isLoggedIn', true);
+
+        if(!mounted) return;
+        Future.delayed(const Duration(seconds: 5), () {
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => const CommonPage(),
+          ));
+          setState(() {
+            _isLoading = false;
+          });
+        });
       } else {
         setState(() {
           _isLoading = false;
@@ -60,7 +64,9 @@ class _LoginPageState extends State<LoginPage> {
             title: Text("Missing Fields"),
             content: Text("Please fill in all required fields."),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel'))
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('Cancel'))
             ],
           ),
         );
@@ -76,12 +82,14 @@ class _LoginPageState extends State<LoginPage> {
           title: Text("Warning"),
           content: Text("Email or password is incorrect."),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel'))
+            TextButton(
+                onPressed: () => Navigator.pop(context), child: Text('Cancel'))
           ],
         ),
       );
     }
   }
+
   bool _validateFields() {
     if (_emailController.text.trim().isEmpty ||
         _passwordController.text.trim().isEmpty) {
@@ -329,13 +337,12 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-          if (_isLoading) 
+          if (_isLoading)
             Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              color: Colors.black87,
-              child: Center(child: CircularProgressIndicator())
-            ),
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                color: Colors.black87,
+                child: Center(child: CircularProgressIndicator())),
         ]),
       ),
     );

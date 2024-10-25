@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:app/components/comment.dart';
 import 'package:app/pages/detailed_page/search_common.dart';
+import 'package:app/storage/dynamics_link.dart';
 import 'package:app/storage/follow_like.dart';
 import 'package:app/storage/like_animation.dart';
 import 'package:app/pages/detailed_page/other_accounts_page.dart';
@@ -205,7 +206,7 @@ class _HomePageState extends State<HomePage> {
                 floating: true, // AppBar sẽ hiện ra ngay khi cuộn xuống
                 snap: true, // AppBar xuất hiện ngay lập tức mà không cần cuộn đến hết chiều dài
                 pinned: false, // AppBar sẽ không được cố định trên cùng
-                automaticallyImplyLeading: true,
+                automaticallyImplyLeading: false,
                 elevation: 0,
                 backgroundColor: Colors.transparent, // màu header ban đầu
                 flexibleSpace: FlexibleSpaceBar(
@@ -241,20 +242,23 @@ class _HomePageState extends State<HomePage> {
                         ),
                         IconButton(
                           icon: const Icon(Icons.share),
-                          onPressed: () async {
-                            final result = await Share.shareWithResult(
-                              'Welcome to Wingle: wingle19.page.link',
-                              subject: 'Invitation',
-                            );
-                            if (result.status == ShareResultStatus.success) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Share successfully')),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Share failure')),
-                              );
-                            }
+                          onPressed: () {
+                            // final result = await Share.shareWithResult(
+                            //   'Welcome to Wingle: wingle19.page.link',
+                            //   subject: 'Invitation',
+                            // );
+                            // if (result.status == ShareResultStatus.success) {
+                            //   ScaffoldMessenger.of(context).showSnackBar(
+                            //     SnackBar(content: Text('Share successfully')),
+                            //   );
+                            // } else {
+                            //   ScaffoldMessenger.of(context).showSnackBar(
+                            //     SnackBar(content: Text('Share failure')),
+                            //   );
+                            // }
+                            DynamicLinkProvider().createLink('abcd1234').then((value) {
+                              Share.share(value);
+                            });
                           },
                           color: Colors.blue,
                         ),
