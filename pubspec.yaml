@@ -68,6 +68,7 @@ dependencies:
   zego_uikit_signaling_plugin: ^2.8.3
   translator: ^1.0.0
   firebase_dynamic_links: ^5.4.17
+  socket_io_client: ^3.0.0
 
 dev_dependencies:
   flutter_test:

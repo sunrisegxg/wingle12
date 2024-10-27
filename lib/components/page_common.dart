@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class CommonPage extends StatefulWidget {
   const CommonPage({super.key,});
@@ -17,7 +18,19 @@ class CommonPage extends StatefulWidget {
 }
 
 class CommonPageState extends State<CommonPage> {
-
+  //socket client
+  late IO.Socket _socket;
+  _connectSocket() {
+    _socket.onConnect((data) => print('Connection established'));
+    _socket.onConnectError((data) => print('Connection error: $data'));
+    _socket.onDisconnect((data) => print('Socket.IO server disconnected'));
+  }
+  @override
+  void initState() {
+    _socket = IO.io('http://localhost:4000', IO.OptionBuilder().setTransports(['websocket']).build());
+    _connectSocket();
+    super.initState();
+  }
   final List<Widget> _pages = [
     HomePage(),
     MyMessagePage(),
