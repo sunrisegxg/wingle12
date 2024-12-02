@@ -7,6 +7,7 @@ import 'package:app/intro/onboarding_screen.dart';
 import 'package:app/pages/bottom_app_bar_page/home_page.dart';
 import 'package:app/pages/bottom_app_bar_page/message_page.dart';
 import 'package:app/pages/detailed_page/chat_page.dart';
+import 'package:app/provider/search_history_provider.dart';
 import 'package:app/services/auth/auth_page.dart';
 import 'package:app/storage/dynamics_link.dart';
 import 'package:app/themes/theme_provider.dart';
@@ -51,6 +52,7 @@ void main() async {
           ChangeNotifierProvider(create: (context) => ThemeProvider()),
           ChangeNotifierProvider(create: (context) => ChatPageActiveProvider()),
           ChangeNotifierProvider(create: (context) => NavigationProvider()),
+          ChangeNotifierProvider(create: (context) => SearchHistoryProvider()),
           // Thêm các provider khác nếu cần
         ],
         child: MyApp(

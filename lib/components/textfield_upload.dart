@@ -2,10 +2,11 @@ import 'package:app/themes/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class TextFieldLocation extends StatelessWidget {
-  const TextFieldLocation({super.key, required this.controller, required this.hintText,});
+class TextFieldUpload extends StatelessWidget {
+  const TextFieldUpload({super.key, required this.controller, required this.hintText, required this.icon,});
   final TextEditingController controller;
   final String hintText;
+  final IconData icon;
   // final Function(String)? onChanged;
   @override
   Widget build(BuildContext context) {
@@ -24,12 +25,9 @@ class TextFieldLocation extends StatelessWidget {
           cursorColor: isDarkMode ? Colors.grey.shade700 : Color.fromARGB(255, 188, 218, 243),
           controller: controller,
           decoration: InputDecoration(
-            prefixIcon: Container(
-              // padding: EdgeInsets.only(right: 20.0),
-              child: Image.asset('lib/images/haha.png', width: 1.0,)),
-            prefixIconConstraints: BoxConstraints(
-              minWidth: 50,
-              minHeight: 50,
+            prefixIcon: Icon(
+              icon,
+              color: const Color.fromARGB(255, 188, 218, 243),
             ),
             border: InputBorder.none,
             hintText: hintText,
@@ -39,7 +37,7 @@ class TextFieldLocation extends StatelessWidget {
               fontWeight: FontWeight.w500,
             ),
           ),
-          style: TextStyle(color: Colors.black, fontFamily: 'Roboto',),
+          style: const TextStyle(color: Colors.black, fontFamily: 'Roboto',),
         ),
       ),
     );

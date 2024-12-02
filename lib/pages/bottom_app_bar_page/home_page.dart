@@ -204,14 +204,17 @@ class _HomePageState extends State<HomePage> {
             slivers: [
               SliverAppBar(
                 floating: true, // AppBar sẽ hiện ra ngay khi cuộn xuống
-                snap: true, // AppBar xuất hiện ngay lập tức mà không cần cuộn đến hết chiều dài
+                snap:
+                    true, // AppBar xuất hiện ngay lập tức mà không cần cuộn đến hết chiều dài
                 pinned: false, // AppBar sẽ không được cố định trên cùng
                 automaticallyImplyLeading: false,
                 elevation: 0,
                 backgroundColor: Colors.transparent, // màu header ban đầu
                 flexibleSpace: FlexibleSpaceBar(
                   background: Container(
-                    color: Theme.of(context).colorScheme.background, // Giữ cùng màu với body
+                    color: Theme.of(context)
+                        .colorScheme
+                        .background, // Giữ cùng màu với body
                   ),
                 ),
                 toolbarHeight: 65,
@@ -256,7 +259,9 @@ class _HomePageState extends State<HomePage> {
                             //     SnackBar(content: Text('Share failure')),
                             //   );
                             // }
-                            DynamicLinkProvider().createLink('abcd1234').then((value) {
+                            DynamicLinkProvider()
+                                .createLink('abcd1234')
+                                .then((value) {
                               Share.share(value);
                             });
                           },
@@ -1102,37 +1107,51 @@ class _HomePageState extends State<HomePage> {
                                                             ],
                                                           ),
                                                         ),
-                                                        Row(
-                                                          children: [
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      left:
-                                                                          12.0,
-                                                                      right:
-                                                                          12.0,
-                                                                      bottom:
-                                                                          15.0),
-                                                              child: Text(
-                                                                '"' +
-                                                                    postData[
-                                                                        'caption'] +
-                                                                    '"',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        16,
-                                                                    color: isDarkMode
-                                                                        ? Colors.grey[
-                                                                            300]
-                                                                        : Colors.grey[
-                                                                            700],
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400),
-                                                              ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 12.0,
+                                                                  right: 12.0,
+                                                                  bottom: 15.0),
+                                                          child: RichText(
+                                                            text: TextSpan(
+                                                              children: [
+                                                                TextSpan(
+                                                                  text: '"' +
+                                                                      postData[
+                                                                          'caption'] +
+                                                                      '"',
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          16,
+                                                                      color: isDarkMode
+                                                                          ? Colors.grey[
+                                                                              300]
+                                                                          : Colors.grey[
+                                                                              700],
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400),
+                                                                ),
+                                                                postData['hashtag'] ==
+                                                                        ''
+                                                                    ? TextSpan()
+                                                                    : TextSpan(
+                                                                        text: '#' +
+                                                                            postData['hashtag'].replaceAll(RegExp(r'[, ]+'),
+                                                                                ' #'),
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                15,
+                                                                            color: isDarkMode
+                                                                                ? Colors.grey.shade700
+                                                                                : Color.fromARGB(255, 162, 211, 248),
+                                                                            fontWeight: FontWeight.w500),
+                                                                      ),
+                                                              ],
                                                             ),
-                                                          ],
+                                                          ),
                                                         ),
                                                       ],
                                                     ),
@@ -1154,9 +1173,7 @@ class _HomePageState extends State<HomePage> {
                       );
                     },
                   );
-                },
-                childCount: 1
-                ),
+                }, childCount: 1),
               ),
             ],
           ),

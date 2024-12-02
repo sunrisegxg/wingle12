@@ -10,9 +10,11 @@ import 'package:app/pages/go_app/loading_page.dart';
 import 'package:app/services/auth/auth_service.dart';
 import 'package:app/services/gg-fb/firebase_services.dart';
 import 'package:app/services/gg-fb/firebase_services2.dart';
+import 'package:app/services/user/user_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback showRegisterPage;
@@ -219,7 +221,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   //sign in button
                   BtnSignIn(
-                    onTap: () {
+                    onTap: () async {
                       login();
                       FocusScope.of(context).unfocus();
                     },

@@ -25,7 +25,7 @@ class _CallInviteState extends State<CallInvite> {
           ],
           isVideoCall: widget.isVideo,
           // callID: widget.callid,
-          resourceID: "zegouikit_call",
+          resourceID: widget.isVideo ? "video_call" : "audio_call",
         ),
       ),
     );

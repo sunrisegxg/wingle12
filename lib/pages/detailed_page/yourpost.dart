@@ -38,6 +38,7 @@ class _YourPostState extends State<YourPost> {
     _fetchUserPostData();
     loadData();
   }
+
   loadData() {
     Future.delayed(const Duration(seconds: 2), () {
       if (!_isDisposed) {
@@ -193,21 +194,28 @@ class _YourPostState extends State<YourPost> {
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            // width: 40.0,
-            // height: 40.0,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: isDarkMode ? Colors.grey.shade500 : Colors.grey.shade300,
-                width: 2.0
+              // width: 40.0,
+              // height: 40.0,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                    color: isDarkMode
+                        ? Colors.grey.shade500
+                        : Colors.grey.shade300,
+                    width: 2.0),
+                // color: Colors.blue,
               ),
-              // color: Colors.blue,
-            ),
-            margin: EdgeInsets.only(left: 20.0,),
-            child: Padding(
-              padding: const EdgeInsets.only(left: 5.0),
-              child: Icon(Icons.arrow_back_ios, size: 14, color: isDarkMode ? Colors.grey.shade500 : Colors.black,),
-            )),
+              margin: EdgeInsets.only(
+                left: 20.0,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 5.0),
+                child: Icon(
+                  Icons.arrow_back_ios,
+                  size: 14,
+                  color: isDarkMode ? Colors.grey.shade500 : Colors.black,
+                ),
+              )),
         ),
         iconTheme: IconThemeData(
           color: isDarkMode
@@ -270,8 +278,9 @@ class _YourPostState extends State<YourPost> {
                                                       MaterialPageRoute(
                                                         builder: (context) =>
                                                             OtherAccountsPage(
-                                                                uid: userData[
-                                                                    'uid'], initialTabIndex: 0,),
+                                                          uid: userData['uid'],
+                                                          initialTabIndex: 0,
+                                                        ),
                                                       ));
                                                 },
                                                 child: ListTile(
@@ -301,26 +310,40 @@ class _YourPostState extends State<YourPost> {
                                                     children: [
                                                       Text(
                                                         timestampToString(
-                                                            userPost['timepost']),
+                                                            userPost[
+                                                                'timepost']),
                                                         style: TextStyle(
                                                             fontSize: 15,
-                                                            color: Colors.grey[600],
+                                                            color: Colors
+                                                                .grey[600],
                                                             fontWeight:
-                                                                FontWeight.w400),
+                                                                FontWeight
+                                                                    .w400),
                                                       ),
-                                                      userPost['location'] == '' ? Container() : Container(
-                                                        width: 147,
-                                                        child: Text(
-                                                          ' · in ' + userPost['location'],
-                                                          maxLines: 1, // Giới hạn số dòng
-                                                          overflow: TextOverflow.ellipsis, // Hiển thị dấu ...
-                                                          style: TextStyle(
-                                                            fontSize: 15,
-                                                            color: Colors.grey[600],
-                                                            fontWeight: FontWeight.w400
-                                                          ),
-                                                        ),
-                                                      )
+                                                      userPost['location'] == ''
+                                                          ? Container()
+                                                          : Container(
+                                                              width: 147,
+                                                              child: Text(
+                                                                ' · in ' +
+                                                                    userPost[
+                                                                        'location'],
+                                                                maxLines:
+                                                                    1, // Giới hạn số dòng
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis, // Hiển thị dấu ...
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        15,
+                                                                    color: Colors
+                                                                            .grey[
+                                                                        600],
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400),
+                                                              ),
+                                                            )
                                                     ],
                                                   ),
                                                   // trailing:
@@ -365,20 +388,45 @@ class _YourPostState extends State<YourPost> {
                                                           BorderRadius.circular(
                                                               20),
                                                       child: FadeInImage(
-                                                        placeholder: AssetImage('assets/shimmer_placeholder.png'),
-                                                        image: NetworkImage(userPost['imagePost']), 
+                                                        placeholder: AssetImage(
+                                                            'assets/shimmer_placeholder.png'),
+                                                        image: NetworkImage(
+                                                            userPost[
+                                                                'imagePost']),
                                                         fit: BoxFit.cover,
                                                         height: 250,
-                                                        width: MediaQuery.of(context).size.width,
-                                                        fadeInDuration: Duration(milliseconds: 500),
-                                                        placeholderErrorBuilder: (context, error, stackTrace) {
-                                                          return Shimmer.fromColors(
-                                                            baseColor: isDarkMode ? Colors.black54 : Colors.black26,
-                                                            highlightColor: isDarkMode ? Colors.white30 : Colors.white38,
+                                                        width: MediaQuery.of(
+                                                                context)
+                                                            .size
+                                                            .width,
+                                                        fadeInDuration:
+                                                            Duration(
+                                                                milliseconds:
+                                                                    500),
+                                                        placeholderErrorBuilder:
+                                                            (context, error,
+                                                                stackTrace) {
+                                                          return Shimmer
+                                                              .fromColors(
+                                                            baseColor: isDarkMode
+                                                                ? Colors.black54
+                                                                : Colors
+                                                                    .black26,
+                                                            highlightColor:
+                                                                isDarkMode
+                                                                    ? Colors
+                                                                        .white30
+                                                                    : Colors
+                                                                        .white38,
                                                             child: Container(
-                                                              decoration: BoxDecoration(
-                                                                borderRadius: BorderRadius.circular(12),
-                                                                color: Colors.black54,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            12),
+                                                                color: Colors
+                                                                    .black54,
                                                               ),
                                                               height: 250,
                                                             ),
@@ -395,16 +443,23 @@ class _YourPostState extends State<YourPost> {
                                                                   .value
                                                                   .isInitialized
                                                           ? ClipRRect(
-                                                            borderRadius: BorderRadius.circular(20),
-                                                            child: AspectRatio(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20),
+                                                              child:
+                                                                  AspectRatio(
                                                                 aspectRatio:
-                                                                    MediaQuery.of(context).size.width / 300,
+                                                                    MediaQuery.of(context)
+                                                                            .size
+                                                                            .width /
+                                                                        300,
                                                                 child: Chewie(
                                                                   controller:
                                                                       _chewieController!,
                                                                 ),
                                                               ),
-                                                          )
+                                                            )
                                                           : Container(
                                                               height: 300,
                                                               child: Center(
@@ -569,7 +624,10 @@ class _YourPostState extends State<YourPost> {
                                                                                                           Navigator.push(
                                                                                                               context,
                                                                                                               MaterialPageRoute(
-                                                                                                                builder: (context) => OtherAccountsPage(uid: userCurrent['uid'], initialTabIndex: 0,),
+                                                                                                                builder: (context) => OtherAccountsPage(
+                                                                                                                  uid: userCurrent['uid'],
+                                                                                                                  initialTabIndex: 0,
+                                                                                                                ),
                                                                                                               ));
                                                                                                         },
                                                                                                         child: ClipOval(
@@ -928,21 +986,54 @@ class _YourPostState extends State<YourPost> {
                                               ),
                                             ),
                                             Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 12.0,
-                                                  right: 12.0,
-                                                  bottom: 15.0),
-                                              child: Text(
-                                                '"' + userPost['caption'] + '"',
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: isDarkMode
-                                                        ? Colors.grey[300]
-                                                        : Colors.grey[700],
-                                                    fontWeight:
-                                                        FontWeight.w400),
-                                              ),
-                                            ),
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 12.0,
+                                                          right: 12.0,
+                                                          bottom: 15.0),
+                                                  child: RichText(
+                                                    text : TextSpan(
+                                                    children: [
+                                                      TextSpan(
+                                                        text: '"' +
+                                                            userPost[
+                                                                'caption'] +
+                                                            '"',
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            color: isDarkMode
+                                                                ? Colors
+                                                                    .grey[300]
+                                                                : Colors
+                                                                    .grey[700],
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w400),
+                                                      ),
+                                                      userPost['hashtag'] == ''
+                                                          ? TextSpan()
+                                                          : TextSpan(
+                                                            text: '#' + userPost['hashtag'].replaceAll(RegExp(r'[, ]+'), ' #'),
+                                                            style: TextStyle(
+                                                                fontSize:
+                                                                    15,
+                                                                color: isDarkMode
+                                                                    ? Colors
+                                                                        .grey
+                                                                        .shade700
+                                                                    : Color.fromARGB(
+                                                                        255,
+                                                                        162,
+                                                                        211,
+                                                                        248),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500),
+                                                          ),
+                                                    ],
+                                                    ),
+                                                  ),
+                                                ),
                                           ],
                                         ),
                                       ),
@@ -953,7 +1044,6 @@ class _YourPostState extends State<YourPost> {
                                   ),
                                 ],
                               );
-                            
                             });
                       } else if (usersnapshot.hasError) {
                         return Center(

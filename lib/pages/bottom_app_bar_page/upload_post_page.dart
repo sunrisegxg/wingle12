@@ -3,8 +3,8 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:app/components/button_upload.dart';
-import 'package:app/components/textFieldlocation.dart';
 import 'package:app/components/textarea.dart';
+import 'package:app/components/textfield_upload.dart';
 import 'package:app/storage/add_data_image_post.dart';
 import 'package:app/storage/add_data_video.dart';
 import 'package:app/themes/theme_provider.dart';
@@ -14,6 +14,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -35,6 +36,7 @@ class _UploadPageState extends State<UploadPage> {
   List<dynamic> listOfLocation = [];
   final _caption = TextEditingController();
   final _location = TextEditingController();
+  final _hashtag = TextEditingController();
   final user = FirebaseAuth.instance.currentUser!;
   final String token = '1234567890';
   Uint8List? _image;
@@ -48,6 +50,7 @@ class _UploadPageState extends State<UploadPage> {
     super.initState();
     _initializeVideoPlayer();
     _caption.addListener(_checkInput);
+    _hashtag.addListener(_checkInput);
     _location.addListener(_onChange);
   }
 
@@ -55,19 +58,22 @@ class _UploadPageState extends State<UploadPage> {
   void dispose() {
     _caption.dispose();
     _location.dispose();
+    _hashtag.dispose();
     if (_videoFile != null) {
       _videoPlayerController!.dispose();
       _chewieController!.dispose();
     }
     _caption
         .removeListener(_checkInput); // Loại bỏ lắng nghe khi widget bị dispose
+    _hashtag.removeListener(_checkInput);
     super.dispose();
   }
 
   void _checkInput() {
     setState(() {
-      _isButtonEnabled =
-          _caption.text.isNotEmpty; // Nếu TextArea có nội dung, kích hoạt nút
+      _isButtonEnabled = _caption.text.isNotEmpty &&
+          _hashtag.text
+              .isNotEmpty; // Nếu TextArea và hashtag có nội dung, kích hoạt nút
     });
   }
 
@@ -135,6 +141,7 @@ class _UploadPageState extends State<UploadPage> {
           'postId': uid,
           'like': like,
           'location': _location.text.trim(),
+          'hashtag': _hashtag.text.trim(),
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -165,6 +172,7 @@ class _UploadPageState extends State<UploadPage> {
           'postId': uid,
           'like': like,
           'location': _location.text.trim(),
+          'hashtag': _hashtag.text.trim(),
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -319,8 +327,10 @@ class _UploadPageState extends State<UploadPage> {
                             height: 30,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color:
-                                isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300, // Màu nền của hình tròn
+                              color: isDarkMode
+                                  ? Colors.grey.shade700
+                                  : Colors
+                                      .grey.shade300, // Màu nền của hình tròn
                             ),
                             child: Center(
                               child: Icon(
@@ -358,8 +368,10 @@ class _UploadPageState extends State<UploadPage> {
                             height: 30,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color:
-                                isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300, // Màu nền của hình tròn
+                              color: isDarkMode
+                                  ? Colors.grey.shade700
+                                  : Colors
+                                      .grey.shade300, // Màu nền của hình tròn
                             ),
                             child: Center(
                               child: Icon(
@@ -406,8 +418,10 @@ class _UploadPageState extends State<UploadPage> {
                             height: 30,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color:
-                                isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300, // Màu nền của hình tròn
+                              color: isDarkMode
+                                  ? Colors.grey.shade700
+                                  : Colors
+                                      .grey.shade300, // Màu nền của hình tròn
                             ),
                             child: Center(
                               child: Icon(
@@ -722,7 +736,7 @@ class _UploadPageState extends State<UploadPage> {
                         ],
                       ),
                       const SizedBox(
-                        height: 10,
+                        height: 5,
                       ),
                       Row(
                         children: [
@@ -732,16 +746,44 @@ class _UploadPageState extends State<UploadPage> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 5),
                       MyTextArea(
                         controller: _caption,
                         hintText: "Type something here",
                       ),
-                      const SizedBox(height: 20),
-                      TextFieldLocation(
+                      const SizedBox(height: 10),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Others",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      Row(
+                        children: [
+                          Text(
+                            '*Required field',
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      TextFieldUpload(
+                        controller: _hashtag,
+                        hintText: 'Hashtag',
+                        icon: FontAwesomeIcons.hashtag,
+                      ),
+                      const SizedBox(height: 10),
+                      TextFieldUpload(
                         controller: _location,
-                        hintText: 'Add a location',
-                        // onChanged: ,
+                        hintText: 'Location',
+                        icon: FontAwesomeIcons.locationCrosshairs,
                       ),
                       const SizedBox(height: 20),
                       BtnUpload(
@@ -750,6 +792,7 @@ class _UploadPageState extends State<UploadPage> {
                               _isLoading = true;
                             });
                             if (_caption.text.isNotEmpty &&
+                                _hashtag.text.isNotEmpty &&
                                 (_image != null || _videoFile != null)) {
                               // Kiểm tra nếu có cả caption và ảnh hoặc video được chọn
                               if (_image != null) {
@@ -767,6 +810,7 @@ class _UploadPageState extends State<UploadPage> {
                               }
                               _caption.clear();
                               _location.clear();
+                              _hashtag.clear();
                             } else if (_caption.text.isEmpty &&
                                 (_image != null || _videoFile != null)) {
                               setState(() {
@@ -777,6 +821,18 @@ class _UploadPageState extends State<UploadPage> {
                                 context: context,
                                 builder: (context) => AlertDialog(
                                   title: Text('Please fill in caption'),
+                                ),
+                              );
+                            } else if (_hashtag.text.isEmpty &&
+                                (_image != null || _videoFile != null)) {
+                              setState(() {
+                                _isLoading = false;
+                              });
+                              // Hiển thị thông báo nếu chưa có hashtag
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: Text('Please fill in hashtag'),
                                 ),
                               );
                             } else {
@@ -853,13 +909,12 @@ class _UploadPageState extends State<UploadPage> {
               ),
             ),
           ),
-          if (_isLoading) 
+          if (_isLoading)
             Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              color: Colors.black87,
-              child: Center(child: CircularProgressIndicator())
-            ),
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                color: Colors.black87,
+                child: Center(child: CircularProgressIndicator())),
         ]),
       ),
     );

@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:app/services/user/user_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
@@ -22,41 +23,10 @@ class AuthService {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email, password: password
       );
+      String username = await UserData().getUserName(FirebaseAuth.instance.currentUser!.uid);
+      ZegoUIKit().login(FirebaseAuth.instance.currentUser!.uid, username);
       // log("\nUser: ${userCredential.user}");
       // log("\nUserAdditionalInfo: ${userCredential.additionalUserInfo}");
-      ZegoUIKitPrebuiltCallInvitationService().init(
-        appID: 1007293522,
-        appSign: '20962baf250e829a7e9b17ddc9a03f4d5345db7bd344079264bb0e80a47d7d55',
-        // callID: widget.callid,
-        userID: getCurrentUser()!.uid,
-        userName: "User : ${getCurrentUser()!.uid}",
-        plugins: [ZegoUIKitSignalingPlugin()],
-        config: ZegoCallInvitationConfig(
-          permissions: [
-            ZegoCallInvitationPermission.microphone,
-            ZegoCallInvitationPermission.camera,
-          ]),
-        requireConfig: (ZegoCallInvitationData data) {
-          if (data.type == ZegoCallType.videoCall) {
-            return ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall()
-              ..turnOnCameraWhenJoining = false
-              ..turnOnMicrophoneWhenJoining = true
-              ..useSpeakerWhenJoining = false;
-          } else if (data.type == ZegoCallType.voiceCall) {
-            return ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall()
-              // ..turnOnCameraWhenJoining = false
-              ..turnOnMicrophoneWhenJoining = true
-              ..useSpeakerWhenJoining = false;
-          } else {
-            // Trả về cấu hình mặc định hoặc null
-            return ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall() // Hoặc cấu hình nào đó bạn muốn
-              ..turnOnMicrophoneWhenJoining = true
-              ..useSpeakerWhenJoining = false;
-          }
-        },
-        
-
-      );
       // String userId = userCredential.user!.uid; // You can use the Firebase user ID
       // String userName = userCredential.user!.displayName ?? 'User'; // Get display name or set a default
       // // Now call ZegoKit login
