@@ -706,7 +706,7 @@ class _HomePageState extends State<HomePage> {
                                                                                                                                             onTap: () async {
                                                                                                                                               if (translatedComments[commentData['uidComment']] == null || translatedComments[commentData['uidComment']] == originalComments[commentData['uidComment']]) {
                                                                                                                                                 originalComments[commentData['uidComment']] = commentData['comment'];
-                                                                                                                                                await translator.translate(commentData['comment'], to: 'hi').then((output) {
+                                                                                                                                                await translator.translate(commentData['comment'], to: 'vi').then((output) {
                                                                                                                                                   setModalState(() {
                                                                                                                                                     translatedComments[commentData['uidComment']] = output.text; // Lưu vào map
                                                                                                                                                     isTranslated = true;

@@ -10,18 +10,23 @@ const messages = []
 // });
 
 io.on('connection', (socket) => {
-  console.log('Username: ');
-  // const username = socket.handshake.query.username;
+  const username = socket.handshake.query.username;
+  const userId = socket.handshake.query.uid;
+  console.log('Client '+ userId +' connected');
   socket.on('message', (data) => {
     const message = {
+      sender: username,
+      sender_uid: userId,
+      receiver_uid: data.receiver_uid,
       messages: data.message,
-      // sendAt: Date.now(),
+      sendAt: new Date(data.sendAt),
     }
     messages.push(message);
+    console.log(message);
     io.emit('message', message);
   });
   socket.on('disconnect', () => {
-    console.log('User disconnected');
+    console.log('Client ' + userId + ' disconnected');
   });
 });
 

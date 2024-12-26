@@ -44,9 +44,9 @@ class CommonPageState extends State<CommonPage> {
       ),
     );
   }
-  Widget _buildAvatar(BuildContext context, Size size) {
+  Widget _buildAvatar(BuildContext context, Size size, String uid) {
     return FutureBuilder(
-      future: UserData().getUserData(user!.uid),
+      future: UserData().getUserData(uid),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -100,24 +100,19 @@ class CommonPageState extends State<CommonPage> {
       requireConfig: (ZegoCallInvitationData data) {
         if (data.type == ZegoCallType.videoCall) {
           return ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall()
-            ..turnOnCameraWhenJoining = false
+            ..turnOnCameraWhenJoining = true
             ..turnOnMicrophoneWhenJoining = true
             ..useSpeakerWhenJoining = false
             ..avatarBuilder =(context, size, user, userInfo) {
-              // Kiểm tra xem `userID` có phải là của người dùng hiện tại hay của người khác
-              if (user!.id == FirebaseAuth.instance.currentUser?.uid) {
-                // Avatar của người dùng hiện tại
-                return _buildAvatar(context, size);
-              } else {
-                // Avatar của người được gọi đến hoặc người tham gia khác
-                return _buildAvatarForOtherUser(context, size);
-              }
+              return _buildAvatar(context, size, user!.id);
             };
-            // ..background = const SizedBox.shrink();
         } else if (data.type == ZegoCallType.voiceCall) {
           return ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall()
             ..turnOnMicrophoneWhenJoining = true
-            ..useSpeakerWhenJoining = false;
+            ..useSpeakerWhenJoining = false
+            ..avatarBuilder =(context, size, user, userInfo) {
+              return _buildAvatar(context, size, user!.id);
+            };
         } else {
           // Trả về cấu hình mặc định hoặc null
           return ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall()

@@ -23,7 +23,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:video_player/video_player.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
@@ -49,26 +51,27 @@ class _ChatPageState extends State<ChatPage> {
   FocusNode myFocusNode = FocusNode();
   // for emoji status
   bool isEmojiVisible = false;
-  //for show more
-  bool isShowed = false;
 
   @override
   void initState() {
     super.initState();
+
     // add listener to focus node
     myFocusNode.addListener(() {
       if (myFocusNode.hasFocus) {
-        setState(() {
-          isEmojiVisible = false; // Ẩn bàn phím emoji khi TextField được focus
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          // Scroll to the bottom when the text field gets focus
+          scrollDown();
         });
-        Future.delayed(
-          const Duration(milliseconds: 500),
-          () => scrollDown(),
-        );
       }
     });
 
-    Future.delayed(const Duration(milliseconds: 500), () => scrollDown());
+    // Sử dụng addPostFrameCallback để đảm bảo việc cuộn chỉ thực hiện sau khi các widget đã được xây dựng
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        scrollDown();
+      });
+    });
   }
 
   void sendCallInvitationDirectly({
@@ -92,40 +95,7 @@ class _ChatPageState extends State<ChatPage> {
       resourceID: isVideoCall ? "video_call" : "audio_call",
     );
   }
-  // void sendCallInvite(bool isVideo) {
 
-  //   List<String> ids = [widget.receiverID, _authService.getCurrentUser()!.uid];
-  //   ids.sort();
-  //   String chatRoomID = ids.join('_');
-  //   // Tạo danh sách người dùng từ IDs
-  //   List<ZegoCallUser> invitees = ids.map((id) {
-  //     return ZegoCallUser.fromUIKit(
-  //       ZegoUIKitUser(
-  //         id: id,
-  //         name: "User: $id",
-  //       ),
-  //     );
-  //   }).toList();
-  //   // Tạo đối tượng người nhận lời mời
-  //   // ZegoUIKitUser invitee = ZegoUIKitUser(
-  //   //   id: widget.receiverID,
-  //   //   name: "User: ${widget.receiverID}",
-  //   // );
-
-  //   // Chuyển đổi ZegoUIKitUser thành ZegoCallUser
-  //   // ZegoCallUser zegoInvitee = ZegoCallUser.fromUIKit(invitee);
-  //   // ZegoCallUser.fromUIKit(
-  //   //   ZegoUIKitUser(id: id, name: "User: $id");
-  //   // );
-
-  //   // Gửi lời mời cho tất cả người dùng trong danh sách
-  //   ZegoUIKitPrebuiltCallInvitationService().send(
-  //     invitees: invitees,
-  //     callID: chatRoomID,
-  //     isVideoCall: isVideo,
-  //     resourceID: isVideo ? "video_call" : "audio_call",
-  //   );
-  // }
   // scroll controller
   final ScrollController _scrollController = ScrollController();
   void scrollDown() {
@@ -140,7 +110,6 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-
   @override
   void dispose() {
     myFocusNode.dispose();
@@ -154,7 +123,11 @@ class _ChatPageState extends State<ChatPage> {
     //if there is a message inside the textfield
     if (_messageController.text.isNotEmpty) {
       //socket client message
-      SocketService().sendMessage(_messageController.text.trim());
+      SocketService().sendMessage(
+        widget.receiverID,
+        _messageController.text.trim(),
+        Timestamp.now(),
+      );
       //send message
       await _chatService.sendMessage(
         widget.receiverID,
@@ -163,22 +136,27 @@ class _ChatPageState extends State<ChatPage> {
       //clear the text control
       _messageController.clear();
     }
-
-    scrollDown();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollDown();
+    });
   }
 
   void toggleEmojiKeyboard() {
+    setState(() {
+      isEmojiVisible = !isEmojiVisible;
+    });
+
     if (isEmojiVisible) {
-      setState(() {
-        isEmojiVisible = false;
-      });
-      myFocusNode.requestFocus();
-    } else {
-      setState(() {
-        isEmojiVisible = true;
-      });
+      // Close keyboard and show emoji panel
       FocusScope.of(context).unfocus();
+    } else {
+      // Open the text field focus and hide emoji panel
+      myFocusNode.requestFocus();
     }
+    // Scroll to the bottom after emoji keyboard toggle
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollDown();
+    });
   }
 
   void onEmojiSelected(Emoji emoji) {
@@ -196,8 +174,9 @@ class _ChatPageState extends State<ChatPage> {
       widget.receiverID,
       videoUrl: videoUrl,
     );
-
-    scrollDown();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollDown();
+    });
   }
 
   // Send image message
@@ -207,8 +186,9 @@ class _ChatPageState extends State<ChatPage> {
       widget.receiverID,
       imageUrl: imageUrl,
     );
-
-    scrollDown();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollDown();
+    });
   }
 
   // Send image message
@@ -224,8 +204,9 @@ class _ChatPageState extends State<ChatPage> {
       fileSize: fileSize,
       fileExtension: fileExtension,
     );
-
-    scrollDown();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollDown();
+    });
   }
 
   //gallery image
@@ -280,6 +261,31 @@ class _ChatPageState extends State<ChatPage> {
     await sendVideoMessage(videoFile);
   }
 
+  Future<void> openAppSettingsIfPermissionDenied() async {
+    var status = await Permission.manageExternalStorage.status;
+
+    if (status.isDenied || status.isPermanentlyDenied) {
+      print("Mở Settings để cấp quyền MANAGE_EXTERNAL_STORAGE");
+      await openAppSettings(); // Mở cài đặt ứng dụng
+    }
+  }
+
+  Future<bool> requestStoragePermission() async {
+    if (await Permission.manageExternalStorage.isGranted) {
+      print("Quyền MANAGE_EXTERNAL_STORAGE đã được cấp");
+      return true;
+    } else {
+      var status = await Permission.manageExternalStorage.request();
+      if (status.isGranted) {
+        print("Quyền MANAGE_EXTERNAL_STORAGE vừa được cấp");
+        return true;
+      } else {
+        print("Quyền MANAGE_EXTERNAL_STORAGE bị từ chối");
+        return false;
+      }
+    }
+  }
+
   //getColor
   Color getColor(String extension) {
     switch (extension.toLowerCase()) {
@@ -309,15 +315,17 @@ class _ChatPageState extends State<ChatPage> {
   Future<void> downloadAndOpenFile(String fileUrl, String fileName) async {
     try {
       // Lấy đường dẫn thư mục lưu trữ tệp
-      Directory appDocDir = await getApplicationDocumentsDirectory();
-      String filePath = path.join(appDocDir.path, fileName);
-
+      Directory? appDocDir = await getExternalStorageDirectory();
+      String filePath = path.join(appDocDir!.path, 'Download', fileName);
+      print("Đường dẫn lưu file: $filePath");
       File file = File(filePath);
 
       // Kiểm tra nếu tệp đã tồn tại
       if (await file.exists()) {
         // Mở tệp
-        await OpenFile.open(filePath);
+        print("Tệp đã tồn tại, mở ngay.");
+        OpenResult result = await OpenFile.open(filePath);
+        print("Kết quả mở file: ${result.type}, message: ${result.message}");
       } else {
         // Tải xuống tệp
         Dio dio = Dio();
@@ -328,9 +336,9 @@ class _ChatPageState extends State<ChatPage> {
             print((received / total * 100).toStringAsFixed(0) + "%");
           }
         });
-
-        // Mở tệp sau khi tải xuống
-        await OpenFile.open(filePath);
+        print("Tải xuống thành công, mở file.");
+        OpenResult result = await OpenFile.open(filePath);
+        print("Kết quả mở file: ${result.type}, message: ${result.message}");
       }
     } catch (e) {
       print("Error downloading or opening file: $e");
@@ -350,7 +358,24 @@ class _ChatPageState extends State<ChatPage> {
 
     return InkWell(
       onTap: () async {
-        // await downloadAndOpenFile(fileUrl, fileName);
+        // Yêu cầu quyền trước
+        bool isPermissionGranted = await requestStoragePermission();
+        if (!isPermissionGranted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Vui lòng cấp quyền lưu trữ trong Cài đặt."),
+              action: SnackBarAction(
+                label: 'Cài đặt',
+                textColor: Colors.white,
+                onPressed: openAppSettingsIfPermissionDenied,
+              ),
+            ),
+          );
+          return;
+        }
+
+        // Tải xuống và mở file nếu có quyền
+        await downloadAndOpenFile(fileUrl, fileName);
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -639,7 +664,7 @@ class _ChatPageState extends State<ChatPage> {
                 String username =
                     await UserData().getUserName(widget.receiverID);
                 sendCallInvitationDirectly(
-                    isVideoCall: true,
+                    isVideoCall: false,
                     targetUserId: widget.receiverID,
                     targetUserName: username,
                     chatRoomID: chatRoomID);
@@ -896,22 +921,15 @@ class _ChatPageState extends State<ChatPage> {
               : Colors.black, // Màu sắc của nút quay về
         ),
       ),
-      body: GestureDetector(
-        onTap: () {
-          setState(() {
-            isShowed = false;
-          });
-        },
-        child: Column(
-          children: [
-            //display all messages
-            Expanded(
-              child: _buildMessageList(),
-            ),
-            //user input
-            _buildUserInput(),
-          ],
-        ),
+      body: Column(
+        children: [
+          //display all messages
+          Expanded(
+            child: _buildMessageList(),
+          ),
+          //user input
+          _buildUserInput(),
+        ],
       ),
     );
   }
@@ -924,6 +942,14 @@ class _ChatPageState extends State<ChatPage> {
     return StreamBuilder(
         stream: _chatService.getMessages(widget.receiverID, senderID),
         builder: (context, snapshot) {
+          // if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+          //   // Dữ liệu đã được tải xong, thực hiện cuộn về cuối
+          //   if (_scrollController.hasClients) {
+          //     WidgetsBinding.instance.addPostFrameCallback((_) {
+          //       scrollDown();
+          //     });
+          //   }
+          // }
           //errors
           if (snapshot.hasError) {
             return const Text('Error');
@@ -940,11 +966,13 @@ class _ChatPageState extends State<ChatPage> {
           //return list view
           return Container(
             color: isDarkMode ? Colors.black38 : Colors.grey.shade100,
-            child: ListView(
+            child: SingleChildScrollView(
               controller: _scrollController,
-              children: snapshot.data!.docs
-                  .map((doc) => _buildMessageItem(doc))
-                  .toList(),
+              child: Column(
+                children: snapshot.data!.docs
+                    .map((doc) => _buildMessageItem(doc))
+                    .toList(),
+              ),
             ),
           );
         });
@@ -952,6 +980,8 @@ class _ChatPageState extends State<ChatPage> {
 
   //build message item
   Widget _buildMessageItem(DocumentSnapshot doc) {
+    bool isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
     // Is current user
@@ -999,10 +1029,29 @@ class _ChatPageState extends State<ChatPage> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    data['imageUrl'],
+                  child: FadeInImage(
+                    placeholder: AssetImage('assets/shimmer_placeholder.png'),
+                    image: NetworkImage(data['imageUrl']),
                     fit: BoxFit.cover,
+                    height: 200,
                     width: MediaQuery.of(context).size.width,
+                    fadeInDuration: Duration(
+                        milliseconds:
+                            300), // Thời gian fade in khi ảnh tải xong
+                    placeholderErrorBuilder: (context, error, stackTrace) {
+                      return Shimmer.fromColors(
+                        baseColor: isDarkMode ? Colors.black54 : Colors.black26,
+                        highlightColor:
+                            isDarkMode ? Colors.white30 : Colors.white38,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.black54,
+                          ),
+                          height: 200,
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -1145,11 +1194,12 @@ class _ChatPageState extends State<ChatPage> {
     bool isDarkMode =
         Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
     return Padding(
-      padding: const EdgeInsets.only(top: 10.0, bottom: 10.0, right: 20.0),
+      padding: const EdgeInsets.only(
+          top: 10.0, bottom: 10.0, right: 20.0, left: 10.0),
       child: Row(
         children: [
           PopupMenuButton(
-            // offset: const Offset(0, 0),
+            iconSize: 30,
             icon: Icon(
               Icons.add_circle,
               color: isDarkMode
@@ -1189,33 +1239,39 @@ class _ChatPageState extends State<ChatPage> {
                   ],
                 ),
               ),
+              PopupMenuItem(
+                onTap: () => showImagePickerOption(context),
+                value: 'image',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.image,
+                      color: isDarkMode
+                          ? Colors.grey.shade700
+                          : Color.fromARGB(255, 67, 163, 241),
+                    ),
+                    SizedBox(width: 10),
+                    Text('Image'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                onTap: () => showImagePickerOption(context),
+                value: 'voice',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.keyboard_voice,
+                      color: isDarkMode
+                          ? Colors.grey.shade700
+                          : Color.fromARGB(255, 67, 163, 241),
+                    ),
+                    SizedBox(width: 10),
+                    Text('Voice'),
+                  ],
+                ),
+              ),
             ],
-          ),
-          IconButton(
-            color: isDarkMode
-                ? Colors.grey.shade700
-                : Color.fromARGB(255, 67, 163, 241),
-            onPressed: () {
-              showImagePickerOption(context);
-            },
-            icon: Icon(
-              Icons.image,
-              color: isDarkMode
-                  ? Colors.grey.shade700
-                  : Color.fromARGB(255, 67, 163, 241),
-            ),
-          ),
-          IconButton(
-            color: isDarkMode
-                ? Colors.grey.shade700
-                : Color.fromARGB(255, 67, 163, 241),
-            onPressed: () {},
-            icon: Icon(
-              Icons.keyboard_voice,
-              color: isDarkMode
-                  ? Colors.grey.shade700
-                  : Color.fromARGB(255, 67, 163, 241),
-            ),
           ),
           Expanded(
             child: Stack(
